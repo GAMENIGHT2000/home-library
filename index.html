@@ -2,87 +2,657 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Home Library</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f3eb;
-      color: #332b25;
-    }
-    header {
-      background: #49382e;
-      color: white;
-      text-align: center;
-      padding: 30px 15px;
-    }
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-    input {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-      margin-top: 25px;
-    }
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px #00000012;
-      text-align: center;
-    }
-    .card h2 { margin-top: 0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#526b57">
+<title>The Enchanted Library</title>
+
+<style>
+:root {
+  --sage:#a9bba5;
+  --forest:#304d3c;
+  --deep:#20382c;
+  --gold:#b79a59;
+  --cream:#f5f1e5;
+  --ink:#29372c;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  color:var(--ink);
+  font-family:Georgia,serif;
+  background:
+    radial-gradient(ellipse at 10% 5%,#c8d6bf,transparent 42%),
+    radial-gradient(ellipse at 90% 80%,#a1b49d,transparent 45%),
+    repeating-linear-gradient(
+      35deg,transparent 0 24px,#47644b08 25px 26px
+    ),
+    #dce5d6;
+  min-height:100vh;
+}
+
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+
+header {
+  background:linear-gradient(145deg,#20382c,#526b57);
+  color:var(--cream);
+  text-align:center;
+  padding:48px 18px 40px;
+  border-bottom:5px double var(--gold);
+  box-shadow:0 6px 24px #18291e44;
+}
+
+.ornament {
+  color:#e0c98c;
+  letter-spacing:12px;
+  font-size:24px;
+}
+
+h1 {
+  font-size:clamp(34px,7vw,64px);
+  margin:15px 0;
+  font-weight:normal;
+  text-shadow:2px 3px 4px #0005;
+}
+
+header p {
+  font-style:italic;
+  color:#e4e8d8;
+  font-size:17px;
+}
+
+.dragon {
+  font-size:35px;
+  margin-top:14px;
+  opacity:.8;
+}
+
+nav {
+  background:var(--deep);
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:13px;
+  border-bottom:2px solid var(--gold);
+}
+
+nav button {
+  color:#f5f1e5;
+  background:transparent;
+  border:1px solid #a58e5c;
+  border-radius:7px;
+  padding:11px 16px;
+}
+
+nav button:hover,
+nav button.active {
+  background:var(--gold);
+  color:#17291f;
+}
+
+main {
+  max-width:1200px;
+  margin:auto;
+  padding:28px 18px 70px;
+}
+
+.intro {
+  background:#f8f5e9ed;
+  border:2px solid var(--gold);
+  outline:1px solid #738b71;
+  outline-offset:4px;
+  border-radius:12px;
+  padding:25px;
+  text-align:center;
+  margin:12px 4px 30px;
+  box-shadow:0 8px 25px #253c2a22;
+}
+
+.intro h2 {
+  color:var(--forest);
+  font-size:29px;
+  margin:5px 0 12px;
+}
+
+.search {
+  width:100%;
+  padding:17px;
+  border:2px solid #8a9e83;
+  border-radius:10px;
+  background:#fffdf7;
+  font-size:17px;
+  margin-bottom:17px;
+}
+
+.filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-bottom:28px;
+}
+
+.filters select {
+  flex:1;
+  min-width:145px;
+  padding:13px;
+  border:1px solid var(--gold);
+  border-radius:8px;
+  background:#f8f5e9;
+  color:var(--forest);
+}
+
+.section-title {
+  color:var(--forest);
+  border-bottom:2px solid var(--gold);
+  padding-bottom:12px;
+  font-size:27px;
+  margin-top:30px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fill,minmax(230px,1fr));
+  gap:22px;
+}
+
+.book-card {
+  background:#fbf9ef;
+  border:2px solid #b9a476;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 6px 15px #263b2c25;
+  transition:transform .2s,box-shadow .2s;
+}
+
+.book-card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 10px 24px #263b2c40;
+}
+
+.book-cover {
+  min-height:185px;
+  background:linear-gradient(135deg,#405d48,#718e70);
+  color:#f4e5b9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:18px;
+  border-bottom:3px double var(--gold);
+}
+
+.book-cover img {
+  max-width:100%;
+  max-height:220px;
+  object-fit:contain;
+}
+
+.cover-placeholder { font-size:46px; }
+
+.book-info { padding:19px; }
+
+.book-info h3 {
+  color:var(--forest);
+  margin:0 0 8px;
+  font-size:21px;
+}
+
+.book-info p {
+  margin:7px 0;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.tag {
+  display:inline-block;
+  background:#dce8d7;
+  border:1px solid #a0b59b;
+  color:#304c39;
+  padding:5px 9px;
+  border-radius:15px;
+  font-size:12px;
+  margin:4px 4px 4px 0;
+}
+
+.gold-button {
+  display:block;
+  width:100%;
+  padding:12px;
+  background:linear-gradient(#cbb57c,#a98b4c);
+  color:#26372b;
+  border:1px solid #806735;
+  border-radius:7px;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+.gold-button:hover { filter:brightness(1.08); }
+
+.empty {
+  grid-column:1/-1;
+  text-align:center;
+  background:#f8f5e9;
+  border:1px solid var(--gold);
+  padding:30px;
+  border-radius:10px;
+}
+
+.status {
+  text-align:center;
+  color:#4b604d;
+  font-style:italic;
+  margin:20px 0;
+}
+
+footer {
+  text-align:center;
+  background:var(--deep);
+  color:#e5dec8;
+  padding:25px;
+  border-top:3px double var(--gold);
+}
+
+dialog {
+  border:2px solid var(--gold);
+  border-radius:12px;
+  background:var(--cream);
+  color:var(--ink);
+  padding:25px;
+  width:min(440px,90vw);
+  max-height:85vh;
+  overflow:auto;
+}
+
+dialog::backdrop { background:#14251bb9; }
+dialog h2 { color:var(--forest); }
+
+.close-button {
+  float:right;
+  border:0;
+  background:transparent;
+  font-size:25px;
+}
+
+@media(max-width:600px) {
+  header { padding:30px 12px; }
+  .grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .book-info { padding:12px; }
+  .book-info h3 { font-size:17px; }
+  .book-cover { min-height:130px; }
+  nav button { flex:1 1 40%; }
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>My Home Library</h1>
-    <p>Your personal collection, all in one place.</p>
-    
+
+<header>
+  <div class="ornament">❧ ✦ ❧</div>
+  <h1>The Enchanted Library</h1>
+  <p>A realm of stories, adventures, and forgotten worlds</p>
+  <div class="dragon">🐉</div>
+</header>
+
+<nav aria-label="Library navigation">
+  <button class="active" data-view="all">✦ Grand Library</button>
+  <button data-view="shelves">📚 Shelves</button>
+  <button data-view="read">❧ Reading Journal</button>
+  <button data-view="loans">🔑 Books on Loan</button>
+</nav>
+
+<main>
+  <section class="intro">
+    <div class="ornament">❦ ✧ ❦</div>
+    <h2>Welcome, Keeper of Stories</h2>
+    <p>
+      Every book is a doorway to another world.
+      Explore your collection and discover your next adventure.
+    </p>
+  </section>
+
+  <input
+    id="search"
+    class="search"
+    type="search"
+    placeholder="🔍 Search titles, authors, and stories..."
+    aria-label="Search library"
+  >
+
+  <div class="filters">
+    <select id="shelfFilter" aria-label="Filter by shelf">
+      <option value="">All Shelves</option>
+    </select>
+
+    <select id="genreFilter" aria-label="Filter by genre">
+      <option value="">All Genres</option>
+    </select>
+
+    <select id="authorFilter" aria-label="Filter by author">
+      <option value="">All Authors</option>
+    </select>
+
+    <select id="statusFilter" aria-label="Filter by reading status">
+      <option value="">All Reading Statuses</option>
+      <option value="Unread">Unread</option>
+      <option value="Currently Reading">Currently Reading</option>
+      <option value="Read">Read</option>
+    </select>
+  </div>
+
+  <h2 class="section-title" id="sectionTitle">
+    ✦ The Grand Library
+  </h2>
+
+  <p class="status" id="bookCount"></p>
+  <div class="grid" id="bookGrid"></div>
+</main>
+
+<dialog id="bookDialog">
+  <button class="close-button" id="closeDialog"
+    aria-label="Close book details">×</button>
+  <h2 id="detailTitle"></h2>
+  <div id="detailContent"></div>
+  <p class="status">
+    Reading and lending controls will be enabled
+    when secure owner access is connected.
+  </p>
+</dialog>
+
+<footer>
+  ❧ The Enchanted Library ❧
+  <p>May your shelves always hold another adventure.</p>
+</footer>
+
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    console.log("Home Library website loaded successfully!");
+"use strict";
+
+/*
+  INITIAL DEMONSTRATION DATA
+
+  This preview uses The Hobbit as a sample book.
+  It does not yet connect to Google Sheets.
+  Public visitors cannot edit the collection.
+*/
+
+const books = [
+  {
+    "Book ID": "demo-hobbit",
+    "Title": "The Hobbit",
+    "Author": "J.R.R. Tolkien",
+    "ISBN": "",
+    "Genre": "Fantasy",
+    "Page Count": "",
+    "Publisher": "",
+    "Publication Date": "",
+    "Edition": "",
+    "Description":
+      "A classic fantasy adventure through Middle-earth.",
+    "Cover URL": "",
+    "Shelf": "Shelf 1",
+    "Reading Status": "Unread",
+    "Loan Status": "Available",
+    "rating": ""
+  }
+];
+
+let currentView = "all";
+
+const grid = document.getElementById("bookGrid");
+const count = document.getElementById("bookCount");
+const search = document.getElementById("search");
+const dialog = document.getElementById("bookDialog");
+
+function text(value) {
+  return String(value ?? "");
+}
+
+function uniqueValues(field) {
+  return [...new Set(
+    books.flatMap(book =>
+      text(book[field])
+        .split(",")
+        .map(value => value.trim())
+        .filter(Boolean)
+    )
+  )].sort((a,b) => a.localeCompare(b));
+}
+
+function populateFilter(id, field) {
+  const select = document.getElementById(id);
+  const first = select.options[0].cloneNode(true);
+  select.replaceChildren(first);
+
+  uniqueValues(field).forEach(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
   });
+}
+
+function matchesFilter(book, field, value) {
+  if (!value) return true;
+  return text(book[field])
+    .split(",")
+    .map(item => item.trim())
+    .includes(value);
+}
+
+function filteredBooks() {
+  const query = search.value.toLowerCase().trim();
+
+  return books.filter(book => {
+    const searchable = [
+      book.Title,
+      book.Author,
+      book.Genre,
+      book.Description,
+      book.ISBN
+    ].map(text).join(" ").toLowerCase();
+
+    if (query && !searchable.includes(query)) return false;
+
+    if (!matchesFilter(book,"Shelf",
+      document.getElementById("shelfFilter").value)) return false;
+
+    if (!matchesFilter(book,"Genre",
+      document.getElementById("genreFilter").value)) return false;
+
+    if (!matchesFilter(book,"Author",
+      document.getElementById("authorFilter").value)) return false;
+
+    if (!matchesFilter(book,"Reading Status",
+      document.getElementById("statusFilter").value)) return false;
+
+    if (currentView === "read" &&
+        book["Reading Status"] !== "Read" &&
+        book["Reading Status"] !== "Currently Reading") {
+      return false;
+    }
+
+    if (currentView === "loans" &&
+        book["Loan Status"] !== "Borrowed") {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function makeElement(tag, className, value) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (value !== undefined) element.textContent = text(value);
+  return element;
+}
+
+function makeBookCard(book) {
+  const card = makeElement("article","book-card");
+  const cover = makeElement("div","book-cover");
+
+  if (book["Cover URL"]) {
+    const img = document.createElement("img");
+    img.src = book["Cover URL"];
+    img.alt = "Cover of " + text(book.Title);
+    img.loading = "lazy";
+    img.onerror = () => {
+      cover.replaceChildren(
+        makeElement("span","cover-placeholder","📖")
+      );
+    };
+    cover.appendChild(img);
+  } else {
+    cover.appendChild(
+      makeElement("span","cover-placeholder","📖")
+    );
+  }
+
+  const info = makeElement("div","book-info");
+  info.appendChild(makeElement("h3","",book.Title));
+  info.appendChild(makeElement("p","",book.Author));
+
+  const genre = makeElement("span","tag",book.Genre || "Uncategorized");
+  const status = makeElement(
+    "span","tag",book["Reading Status"] || "Unread"
+  );
+
+  info.appendChild(genre);
+  info.appendChild(status);
+
+  info.appendChild(
+    makeElement("p","", "📍 " + (book.Shelf || "Unassigned"))
+  );
+
+  const button = makeElement("button","gold-button","View Book ✦");
+  button.addEventListener("click",() => showBook(book));
+  info.appendChild(button);
+
+  card.append(cover,info);
+  return card;
+}
+
+function showBook(book) {
+  document.getElementById("detailTitle").textContent =
+    book.Title || "Untitled Book";
+
+  const details = document.getElementById("detailContent");
+  details.replaceChildren();
+
+  const fields = [
+    ["Author",book.Author],
+    ["Genre",book.Genre],
+    ["Shelf",book.Shelf],
+    ["Reading Status",book["Reading Status"]],
+    ["Loan Status",book["Loan Status"]],
+    ["Pages",book["Page Count"]],
+    ["Edition",book.Edition],
+    ["Publisher",book.Publisher],
+    ["Rating",book.rating],
+    ["Description",book.Description]
+  ];
+
+  fields.forEach(([label,value]) => {
+    if (!value) return;
+    const p = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = label + ": ";
+    p.append(strong,document.createTextNode(text(value)));
+    details.appendChild(p);
+  });
+
+  dialog.showModal();
+}
+
+function renderBooks() {
+  const results = filteredBooks();
+  grid.replaceChildren();
+
+  count.textContent =
+    results.length + (results.length === 1 ? " book" : " books") +
+    " in this view";
+
+  if (!results.length) {
+    grid.appendChild(
+      makeElement(
+        "div",
+        "empty",
+        "No books found in this part of the realm."
+      )
+    );
+    return;
+  }
+
+  results.forEach(book => {
+    grid.appendChild(makeBookCard(book));
+  });
+}
+
+function setView(view) {
+  currentView = view;
+
+  document.querySelectorAll("nav button").forEach(button => {
+    button.classList.toggle(
+      "active",button.dataset.view === view
+    );
+  });
+
+  const titles = {
+    all:"✦ The Grand Library",
+    shelves:"📚 Browse the Shelves",
+    read:"❧ Reading Journal",
+    loans:"🔑 Books on Loan"
+  };
+
+  document.getElementById("sectionTitle").textContent =
+    titles[view];
+
+  document.getElementById("statusFilter").value = "";
+
+  if (view === "shelves") {
+    document.getElementById("shelfFilter").focus();
+  }
+
+  renderBooks();
+}
+
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click",() => {
+    setView(button.dataset.view);
+  });
+});
+
+search.addEventListener("input",renderBooks);
+
+[
+  "shelfFilter",
+  "genreFilter",
+  "authorFilter",
+  "statusFilter"
+].forEach(id => {
+  document.getElementById(id)
+    .addEventListener("change",renderBooks);
+});
+
+document.getElementById("closeDialog")
+  .addEventListener("click",() => dialog.close());
+
+dialog.addEventListener("click",event => {
+  if (event.target === dialog) dialog.close();
+});
+
+populateFilter("shelfFilter","Shelf");
+populateFilter("genreFilter","Genre");
+populateFilter("authorFilter","Author");
+renderBooks();
 </script>
 
-  </header>
-
-  <main>
-    <input type="search" placeholder="Search your books..."
-           aria-label="Search books">
-
-    <div class="grid">
-      <div class="card">
-        <h2>My Books</h2>
-        <p>Browse your entire collection</p>
-      </div>
-      <div class="card">
-        <h2>My Shelves</h2>
-        <p>Find books by shelf location</p>
-      </div>
-      <div class="card">
-        <h2>Reading Status</h2>
-        <p>Read, unread, and currently reading</p>
-      </div>
-      <div class="card">
-        <h2>Borrowed Books</h2>
-        <p>Track books you've lent out</p>
-      </div>
-    </div>
-  </main>
 </body>
 </html>
-
