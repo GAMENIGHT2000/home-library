@@ -688,52 +688,42 @@ async function lookupISBN() {
         encodeURIComponent(isbn) + "-L.jpg?default=false";
     }
 
-    // Open Library edition records frequently omit author names or keys.
-    // Try edition authors, then the linked work, then an ISBN search fallback.
-    async function resolveAuthors(records) {
-      if (!Array.isArray(records)) return [];
-      const names = await Promise.all(records.map(async item => {
-        if (typeof item?.name === "string") return item.name;
-        const key = item?.author?.key || item?.key;
-        if (typeof key !== "string" ||
-            !/^\/authors\/[A-Za-z0-9]+$/.test(key)) return "";
-        try {
-          const response = await fetch("https://openlibrary.org" + key + ".json");
-          if (!response.ok) return "";
-          const author = await response.json();
-          return author.name || "";
-        } catch (error) { return ""; }
-      }));
-      return [...new Set(names.filter(Boolean))];
-    }
+    // Author lookup: preserve the original ISBN flow, with safe fallbacks.
+    // Open Library edition authors may be keys, nested author keys,
+    // or absent altogether. An author request failure must not break
+    // scanning or the rest of the book details.
+    try {
+      const authorKeys = (book.authors || [])
+        .map(a => a?.key || a?.author?.key || "")
+        .filter(key => /^\/authors\/[A-Za-z0-9]+$/.test(key));
 
-    let authorNames = await resolveAuthors(book.authors);
-    if (!authorNames.length && Array.isArray(book.works)) {
-      const workKey = book.works[0]?.key;
-      if (/^\/works\/[A-Za-z0-9]+$/.test(workKey || "")) {
-        try {
-          const response = await fetch("https://openlibrary.org" + workKey + ".json");
-          if (response.ok) {
-            const work = await response.json();
-            authorNames = await resolveAuthors(work.authors);
-          }
-        } catch (error) { console.warn("Work authors unavailable", error); }
-      }
-    }
-    if (!authorNames.length) {
-      try {
-        const response = await fetch(
+      const authorResults = await Promise.allSettled(
+        authorKeys.map(async key => {
+          const r = await fetch("https://openlibrary.org" + key + ".json");
+          if(!r.ok) return "";
+          const author = await r.json();
+          return author.name || author.personal_name || "";
+        })
+      );
+      let names = authorResults
+        .filter(r => r.status === "fulfilled" && r.value)
+        .map(r => r.value);
+
+      // If the edition doesn't list usable authors, search by ISBN.
+      if(!names.length) {
+        const searchResponse = await fetch(
           "https://openlibrary.org/search.json?isbn=" +
-          encodeURIComponent(isbn) + "&limit=1&fields=author_name,title,isbn"
+          encodeURIComponent(isbn) + "&limit=1&fields=author_name"
         );
-        if (response.ok) {
-          const data = await response.json();
-          authorNames = (data.docs?.[0]?.author_name || [])
-            .filter(name => typeof name === "string");
+        if(searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          names = searchData.docs?.[0]?.author_name || [];
         }
-      } catch (error) { console.warn("ISBN author fallback unavailable", error); }
+      }
+      if(names.length) $("authorInput").value = [...new Set(names)].join(", ");
+    } catch(authorError) {
+      console.warn("Author lookup unavailable; book details still loaded", authorError);
     }
-    $("authorInput").value = authorNames.join(", ");
 
     let subjects = book.subjects || [];
     if(!subjects.length && Array.isArray(book.works) && book.works[0]?.key) {
@@ -749,7 +739,8 @@ async function lookupISBN() {
     $("genreInput").value = subjects.slice(0,3).join(", ");
 
     $("scanMessage").textContent =
-      "Book found! Review the details, then save.";
+      "Book found! Review the details, " +
+      "then save when saving is enabled.";
 
   } catch(e) {
     console.error("Open Library lookup error:",e);
