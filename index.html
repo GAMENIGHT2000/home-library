@@ -938,7 +938,38 @@ $("lookupButton").addEventListener("click",lookupISBN);
 $("bookForm").addEventListener("submit",saveBook);
 $("deleteButton").addEventListener("click",deleteBook);
 
-loadBooks();
+// Open an NFC shelf link with the matching shelf selected.
+async function startLibrary() {
+  const loaded = await loadBooks();
+  if (!loaded) return;
+
+  const requestedShelf = new URLSearchParams(
+    window.location.search
+  ).get("shelf");
+
+  if (!requestedShelf) return;
+
+  const shelfSelector = $("shelf");
+  const match = Array.from(shelfSelector.options).find(
+    option => option.value.toLowerCase() ===
+      requestedShelf.trim().toLowerCase()
+  );
+
+  // Preserve the shelf filter even if that shelf is still empty.
+  if (match) {
+    shelfSelector.value = match.value;
+  } else if (/^Shelf [1-7]$/i.test(requestedShelf.trim())) {
+    const shelfName = "Shelf " + requestedShelf.trim().match(/[1-7]$/)[0];
+    shelfSelector.add(new Option(shelfName, shelfName));
+    shelfSelector.value = shelfName;
+  } else {
+    return;
+  }
+
+  setView("shelves");
+}
+
+startLibrary();
 </script>
 </body>
 </html>
