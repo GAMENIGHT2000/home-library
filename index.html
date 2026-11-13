@@ -408,6 +408,14 @@ function node(tag,cls,value) {
   return x;
 }
 
+// Treat "4", "Shelf 4", and "shelf 4" as the same shelf.
+// This changes display/filtering only, not saved spreadsheet values.
+function canonicalShelf(value) {
+  const label = str(value).trim();
+  const match = label.match(/^(?:shelf\s*)?(\d+)$/i);
+  return match ? "Shelf " + Number(match[1]) : label;
+}
+
 function refreshFilters() {
   for(const [id,field] of Object.entries({
     shelf:"Shelf",
@@ -415,13 +423,14 @@ function refreshFilters() {
     author:"Author"
   })) {
     const select = $(id);
-    const previous = select.value;
+    const previous = id === "shelf" ? canonicalShelf(select.value) : select.value;
     const first = select.options[0].cloneNode(true);
     select.replaceChildren(first);
     const values = [...new Set(
       books.flatMap(b =>
         str(b[field]).split(",")
-          .map(s => s.trim()).filter(Boolean)
+          .map(s => id === "shelf" ? canonicalShelf(s) : s.trim())
+          .filter(Boolean)
       )
     )].sort();
     values.forEach(v => select.add(new Option(v,v)));
@@ -432,7 +441,9 @@ function refreshFilters() {
 function matches(b,id,field) {
   const value = $(id).value;
   return !value || str(b[field])
-    .split(",").map(s => s.trim()).includes(value);
+    .split(",")
+    .map(s => id === "shelf" ? canonicalShelf(s) : s.trim())
+    .includes(id === "shelf" ? canonicalShelf(value) : value);
 }
 
 function filteredBooks() {
@@ -479,7 +490,7 @@ function makeCard(b) {
     node("p","",b.Author || "Unknown author"),
     node("span","tag",b.Genre || "Uncategorized"),
     node("span","tag",b["Reading Status"] || "Unread"),
-    node("p","","Shelf: " + (b.Shelf || "Unassigned"))
+    node("p","","Shelf: " + (canonicalShelf(b.Shelf) || "Unassigned"))
   );
 
   const button = node("button","gold card-button","View / Edit");
@@ -1046,10 +1057,15 @@ async function startLibrary() {
   await loadBooks();
   const requestedShelf = new URLSearchParams(location.search).get("shelf");
   if(requestedShelf) {
+    const normalized = canonicalShelf(requestedShelf);
     const selector = $("shelf");
-    if(!Array.from(selector.options).some(o => o.value.toLowerCase() === requestedShelf.toLowerCase()))
-      selector.add(new Option(requestedShelf,requestedShelf));
-    const option = Array.from(selector.options).find(o => o.value.toLowerCase() === requestedShelf.toLowerCase());
+    let option = Array.from(selector.options).find(
+      o => canonicalShelf(o.value).toLowerCase() === normalized.toLowerCase()
+    );
+    if(!option) {
+      option = new Option(normalized, normalized);
+      selector.add(option);
+    }
     selector.value = option.value;
     setView("shelves");
   }
