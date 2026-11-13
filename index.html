@@ -3,294 +3,265 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#344c3a">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#294534">
 <title>The Enchanted Library</title>
-
 <style>
 :root {
-  --forest: #294534;
-  --deep: #20372a;
-  --sage: #a8bea5;
-  --gold: #c3a365;
-  --paper: #f8f5e9;
-  --ink: #263b2e;
+  --forest:#294534;
+  --deep:#1e3428;
+  --sage:#adc2a7;
+  --gold:#c7a86b;
+  --paper:#f8f4e7;
+  --ink:#263b2e;
 }
-
-* { box-sizing: border-box; }
-
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  color: var(--ink);
-  font-family: Georgia, serif;
+  margin:0;
+  color:var(--ink);
+  font-family:Georgia,serif;
   background:
-    radial-gradient(circle at 10% 10%, #c9d9c3, transparent 40%),
-    radial-gradient(circle at 85% 80%, #a8bfa5, transparent 45%),
+    radial-gradient(ellipse at 15% 15%,#bed1b7 0,transparent 45%),
+    radial-gradient(ellipse at 85% 70%,#91aa91 0,transparent 50%),
     repeating-linear-gradient(
-      35deg, transparent 0 25px, #34583a0b 26px 27px
+      120deg,transparent 0 35px,#284d3510 36px 37px
     ),
-    #dbe6d6;
-  min-height: 100vh;
+    #d9e4d3;
+  min-height:100vh;
 }
-
-button, input, select { font: inherit; }
-button { cursor: pointer; }
-
+button,input,select,textarea { font:inherit; }
+button { cursor:pointer; }
 header {
-  text-align: center;
-  background: linear-gradient(130deg, #20372a, #4b6b50);
-  color: #f6f0dd;
-  padding: 42px 16px;
-  border-bottom: 5px double var(--gold);
+  padding:42px 16px;
+  text-align:center;
+  color:#f9f2dc;
+  background:
+    linear-gradient(120deg,#162a20e8,#385941eb),
+    radial-gradient(circle at 50% 0,#9fae8c,#20392c);
+  border-bottom:5px double var(--gold);
 }
-
-header h1 {
-  font-weight: normal;
-  font-size: clamp(35px, 7vw, 65px);
-  margin: 10px 0;
+h1 {
+  font-weight:normal;
+  font-size:clamp(35px,7vw,62px);
+  margin:8px 0;
 }
-
-header p { font-style: italic; }
-
+header p { font-style:italic; }
 .ornament {
-  color: #e5ca8b;
-  letter-spacing: 8px;
-  font-size: 24px;
+  color:#e8cb89;
+  letter-spacing:8px;
+  font-size:23px;
 }
-
 nav {
-  background: var(--deep);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  border-bottom: 2px solid var(--gold);
+  background:var(--deep);
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:12px;
+  border-bottom:2px solid var(--gold);
 }
-
 nav button {
-  color: #f9f2dc;
-  background: transparent;
-  border: 1px solid var(--gold);
-  padding: 11px 16px;
-  border-radius: 8px;
+  background:transparent;
+  color:#f8f0dc;
+  border:1px solid var(--gold);
+  border-radius:8px;
+  padding:12px 16px;
 }
-
-nav button.active,
-nav button:hover {
-  background: var(--gold);
-  color: #213727;
+nav button.active,nav button:hover {
+  background:var(--gold);
+  color:var(--deep);
 }
-
 main {
-  max-width: 1180px;
-  margin: auto;
-  padding: 24px 16px 65px;
+  max-width:1180px;
+  margin:auto;
+  padding:24px 16px 70px;
 }
-
 .intro {
-  background: #faf7ebed;
-  border: 2px solid var(--gold);
-  border-radius: 12px;
-  text-align: center;
-  padding: 22px;
-  margin: 8px 0 28px;
-  box-shadow: 0 6px 20px #20372725;
+  padding:25px;
+  text-align:center;
+  background:#faf7ebed;
+  border:3px double var(--gold);
+  border-radius:12px;
+  box-shadow:0 8px 25px #20372725;
+  margin-bottom:25px;
 }
-
-.intro h2 {
-  margin: 8px;
-  color: var(--forest);
-}
-
-.search {
-  width: 100%;
-  padding: 15px;
-  border: 2px solid #8da487;
-  border-radius: 9px;
-  background: #fffdf8;
-  font-size: 17px;
-}
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 14px 0 24px;
-}
-
-.filters select {
-  flex: 1;
-  min-width: 150px;
-  padding: 12px;
-  border: 1px solid var(--gold);
-  border-radius: 8px;
-  background: var(--paper);
-}
-
-h2.section {
-  border-bottom: 2px solid var(--gold);
-  padding-bottom: 10px;
-  color: var(--forest);
-}
-
-.status {
-  font-style: italic;
-  color: #3b5c42;
-  text-align: center;
-  min-height: 22px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.book {
-  background: #fcf9ee;
-  border: 2px solid #bba577;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 16px #253b2c25;
-}
-
-.cover {
-  height: 230px;
-  background: linear-gradient(135deg, #38583f, #769477);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 3px double var(--gold);
-  color: #f7e8b7;
-}
-
-.cover img {
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
-}
-
-.placeholder { font-size: 54px; }
-
-.info { padding: 17px; }
-
-.info h3 {
-  margin: 0 0 8px;
-  color: var(--forest);
-}
-
-.info p { margin: 7px 0; }
-
-.tag {
-  display: inline-block;
-  padding: 5px 8px;
-  margin: 5px 4px 5px 0;
-  background: #dce9d7;
-  border: 1px solid #a5bba0;
-  border-radius: 15px;
-  font-size: 12px;
-}
-
+.intro h2,.section { color:var(--forest); }
 .gold {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  background: linear-gradient(#d4bc81, #b49756);
-  color: #233729;
-  border: 1px solid #856c37;
-  border-radius: 7px;
-  font-weight: bold;
+  background:linear-gradient(#dfcb97,#b59556);
+  border:1px solid #826634;
+  color:#25372b;
+  border-radius:8px;
+  padding:12px 18px;
+  font-weight:bold;
 }
-
-.gold:hover { filter: brightness(1.08); }
-
-.empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  background: var(--paper);
-  padding: 26px;
-  border: 1px solid var(--gold);
-  border-radius: 10px;
+.gold:hover { filter:brightness(1.08); }
+.gold:disabled { opacity:.6;cursor:wait; }
+.primary { font-size:19px;margin-top:10px; }
+.search {
+  width:100%;
+  padding:15px;
+  border:2px solid #8da487;
+  border-radius:9px;
+  background:#fffdf8;
+  font-size:17px;
 }
-
-.retry {
-  margin: 8px auto;
-  display: block;
-  max-width: 230px;
+.filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:14px 0 24px;
 }
-
-.retry[hidden] { display: none; }
-
-footer {
-  text-align: center;
-  background: var(--deep);
-  color: #efe4c8;
-  padding: 25px;
-  border-top: 3px double var(--gold);
+.filters select {
+  flex:1;
+  min-width:140px;
+  padding:12px;
+  border:1px solid var(--gold);
+  border-radius:8px;
+  background:var(--paper);
 }
-
+.section {
+  border-bottom:2px solid var(--gold);
+  padding-bottom:10px;
+}
+.status {
+  text-align:center;
+  color:#3b5c42;
+  font-style:italic;
+  min-height:24px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+}
+.book {
+  background:#fcf9ee;
+  border:2px solid #bba577;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 6px 16px #253b2c25;
+}
+.cover {
+  height:230px;
+  background:linear-gradient(135deg,#38583f,#769477);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f7e8b7;
+  border-bottom:3px double var(--gold);
+}
+.cover img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+.placeholder { font-size:54px; }
+.info { padding:17px; }
+.info h3 { color:var(--forest);margin:0 0 8px; }
+.info p { margin:7px 0; }
+.tag {
+  display:inline-block;
+  padding:5px 8px;
+  margin:5px 4px 5px 0;
+  background:#dce9d7;
+  border:1px solid #a5bba0;
+  border-radius:15px;
+  font-size:12px;
+}
+.card-button { width:100%;margin-top:12px; }
 dialog {
-  border: 2px solid var(--gold);
-  border-radius: 12px;
-  background: var(--paper);
-  color: var(--ink);
-  width: min(500px, 92vw);
-  max-height: 85vh;
-  overflow: auto;
-  padding: 22px;
+  border:2px solid var(--gold);
+  border-radius:12px;
+  background:var(--paper);
+  color:var(--ink);
+  width:min(580px,94vw);
+  max-height:90vh;
+  overflow:auto;
+  padding:24px;
 }
-
-dialog::backdrop { background: #14251bbb; }
-
+dialog::backdrop { background:#14251bbb; }
 .close {
-  float: right;
-  border: 0;
-  background: transparent;
-  font-size: 28px;
+  float:right;
+  border:0;
+  background:transparent;
+  font-size:28px;
 }
-
-@media (max-width: 600px) {
+.field { margin:12px 0; }
+.field label {
+  display:block;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+.field input,.field select,.field textarea {
+  width:100%;
+  padding:11px;
+  border:1px solid #91a48b;
+  border-radius:6px;
+  background:#fffdf8;
+}
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:14px 0;
+}
+.actions button { flex:1; }
+#scanner {
+  width:100%;
+  max-height:280px;
+  background:#14251b;
+  border-radius:8px;
+}
+[hidden] { display:none!important; }
+.message { min-height:22px;font-style:italic; }
+footer {
+  text-align:center;
+  background:var(--deep);
+  color:#efe4c8;
+  padding:25px;
+  border-top:3px double var(--gold);
+}
+@media(max-width:600px) {
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
   }
-  .cover { height: 165px; }
-  .info { padding: 12px; }
-  .info h3 { font-size: 17px; }
-  nav button { flex: 1 1 40%; }
+  .cover { height:165px; }
+  .info { padding:12px; }
+  .info h3 { font-size:17px; }
+  nav button { flex:1 1 40%; }
 }
 </style>
 </head>
-
 <body>
 
 <header>
   <div class="ornament">❧ ✦ ❧</div>
   <h1>The Enchanted Library</h1>
   <p>A realm of stories, adventures, and forgotten worlds</p>
-  <div class="ornament">❦ 🐉 ❦</div>
+  <div class="ornament">❦ ✧ ❦</div>
 </header>
 
 <nav aria-label="Library navigation">
-  <button class="active" data-view="all">✦ Grand Library</button>
-  <button data-view="shelves">📚 Shelves</button>
-  <button data-view="read">❧ Reading Journal</button>
-  <button data-view="loans">🔑 Books on Loan</button>
+  <button class="active" data-view="all">Grand Library</button>
+  <button data-view="shelves">Shelves</button>
+  <button data-view="read">Reading Journal</button>
+  <button data-view="loans">Books on Loan</button>
 </nav>
 
 <main>
   <section class="intro">
     <div class="ornament">❦ ✧ ❦</div>
     <h2>Welcome, Keeper of Stories</h2>
-    <p>
-      Every book is a doorway to another world.
-      Explore your collection and discover your next adventure.
-    </p>
+    <p>Every book is a doorway to another world.</p>
+    <button class="gold primary" id="addButton">
+      ✦ Add New Book
+    </button>
   </section>
 
   <input id="search" class="search" type="search"
-    placeholder="Search titles, authors, and stories..."
+    placeholder="Search titles, authors, ISBN..."
     aria-label="Search books">
 
   <div class="filters">
@@ -312,22 +283,94 @@ dialog::backdrop { background: #14251bbb; }
   </div>
 
   <h2 id="section" class="section">✦ The Grand Library</h2>
-
-  <p id="status" class="status" role="status" aria-live="polite">
+  <p id="status" class="status" role="status">
     Loading your library...
   </p>
-
-  <button id="retry" class="gold retry" hidden>
-    Try loading again
-  </button>
-
   <div id="grid" class="grid"></div>
 </main>
 
-<dialog id="details">
-  <button id="close" class="close" aria-label="Close">×</button>
-  <h2 id="detailTitle"></h2>
-  <div id="detailBody"></div>
+<dialog id="editor">
+  <button id="closeEditor" class="close"
+    aria-label="Close">×</button>
+  <h2 id="editorTitle">Add Book</h2>
+
+  <div class="field">
+    <label for="isbn">ISBN / Barcode</label>
+    <input id="isbn" inputmode="numeric"
+      placeholder="Enter or scan ISBN">
+  </div>
+
+  <div class="actions">
+    <button type="button" class="gold" id="scanButton">
+      Scan Barcode
+    </button>
+    <button type="button" class="gold" id="lookupButton">
+      Look Up ISBN
+    </button>
+  </div>
+
+  <video id="scanner" playsinline muted hidden></video>
+  <p id="scanMessage" class="message"></p>
+
+  <form id="bookForm">
+    <div class="field">
+      <label for="title">Title *</label>
+      <input id="title" required>
+    </div>
+    <div class="field">
+      <label for="authorInput">Author</label>
+      <input id="authorInput">
+    </div>
+    <div class="field">
+      <label for="genreInput">Genre</label>
+      <input id="genreInput">
+    </div>
+    <div class="field">
+      <label for="publisher">Publisher</label>
+      <input id="publisher">
+    </div>
+    <div class="field">
+      <label for="pages">Page Count</label>
+      <input id="pages" type="number" min="0">
+    </div>
+    <div class="field">
+      <label for="coverUrl">Cover Image URL</label>
+      <input id="coverUrl" type="url">
+    </div>
+    <div class="field">
+      <label for="shelfInput">Shelf</label>
+      <input id="shelfInput">
+    </div>
+    <div class="field">
+      <label for="readingInput">Reading Status</label>
+      <select id="readingInput">
+        <option>Unread</option>
+        <option>Currently Reading</option>
+        <option>Read</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="loanInput">Loan Status</label>
+      <select id="loanInput">
+        <option>Available</option>
+        <option>Borrowed</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" rows="4"></textarea>
+    </div>
+
+    <button type="submit" id="saveButton" class="gold">
+      Save Book
+    </button>
+    <button type="button" id="deleteButton"
+      class="gold" hidden>
+      Delete Book
+    </button>
+    <p id="saveMessage" class="message"
+      role="status"></p>
+  </form>
 </dialog>
 
 <footer>
@@ -338,275 +381,514 @@ dialog::backdrop { background: #14251bbb; }
 <script>
 "use strict";
 
-// Your existing Google Apps Script deployment.
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxRI_MokHd0QWyyVGm_A3WpGR1YmRlSHNh5DZEVtQfsIx8Ui5DZfdOK-BJLOFs5pnA/exec";
+"https://script.google.com/macros/s/AKfycbxRI_MokHd0QWyyVGm_A3WpGR1YmRlSHNh5DZEVtQfsIx8Ui5DZfdOK-BJLOFs5pnA/exec";
+
+const $ = id => document.getElementById(id);
+const str = v => String(v ?? "");
 
 let books = [];
 let view = "all";
+let editingId = null;
+let originalBook = {};
+let cameraStream = null;
+let scanning = false;
 
-const el = id => document.getElementById(id);
-const str = value => String(value ?? "");
-
-const fields = {
-  shelf: "Shelf",
-  genre: "Genre",
-  author: "Author"
-};
-
-function node(tag, className, content) {
+function node(tag,cls,value) {
   const x = document.createElement(tag);
-  if (className) x.className = className;
-  if (content !== undefined) x.textContent = str(content);
+  if(cls) x.className = cls;
+  if(value !== undefined) x.textContent = str(value);
   return x;
 }
 
 function refreshFilters() {
-  for (const [id, field] of Object.entries(fields)) {
-    const select = el(id);
-    const selected = select.value;
-
-    const labels = {
-      shelf: "All Shelves",
-      genre: "All Genres",
-      author: "All Authors"
-    };
-
-    select.replaceChildren(new Option(labels[id], ""));
+  for(const [id,field] of Object.entries({
+    shelf:"Shelf",
+    genre:"Genre",
+    author:"Author"
+  })) {
+    const select = $(id);
+    const previous = select.value;
+    const first = select.options[0].cloneNode(true);
+    select.replaceChildren(first);
 
     const values = [...new Set(
       books.flatMap(b =>
-        str(b[field])
-          .split(",")
-          .map(s => s.trim())
-          .filter(Boolean)
+        str(b[field]).split(",")
+          .map(s => s.trim()).filter(Boolean)
       )
-    )].sort((a, b) => a.localeCompare(b));
+    )].sort();
 
-    for (const value of values) {
-      select.add(new Option(value, value));
-    }
-
-    if (values.includes(selected)) select.value = selected;
+    values.forEach(v => select.add(new Option(v,v)));
+    if(values.includes(previous)) select.value = previous;
   }
 }
 
-function matches(book, id, field) {
-  const val = el(id).value;
-  return !val || str(book[field])
-    .split(",")
-    .map(s => s.trim())
-    .includes(val);
+function matches(b,id,field) {
+  const value = $(id).value;
+  return !value || str(b[field])
+    .split(",").map(s => s.trim()).includes(value);
 }
 
-function filtered() {
-  const q = el("search").value.toLowerCase().trim();
+function filteredBooks() {
+  const q = $("search").value.toLowerCase().trim();
 
   return books.filter(b => {
     const searchable = [
-      b.Title, b.Author, b.Genre, b.Description, b.ISBN
+      b.Title,b.Author,b.Genre,b.Description,b.ISBN
     ].map(str).join(" ").toLowerCase();
 
-    if (q && !searchable.includes(q)) return false;
+    if(q && !searchable.includes(q)) return false;
+    if(!matches(b,"shelf","Shelf")) return false;
+    if(!matches(b,"genre","Genre")) return false;
+    if(!matches(b,"author","Author")) return false;
+    if(!matches(b,"reading","Reading Status")) return false;
 
-    if (!Object.entries(fields).every(
-      ([id, field]) => matches(b, id, field)
-    )) return false;
+    if(view === "read" &&
+      !["Read","Currently Reading"].includes(
+        str(b["Reading Status"]))) return false;
 
-    if (!matches(b, "reading", "Reading Status")) return false;
-
-    if (view === "read" &&
-        !["Read", "Currently Reading"].includes(
-          str(b["Reading Status"])
-        )) return false;
-
-    if (view === "loans" &&
-        str(b["Loan Status"]) !== "Borrowed") return false;
+    if(view === "loans" &&
+      str(b["Loan Status"]) !== "Borrowed") return false;
 
     return true;
   });
 }
 
-function showBook(b) {
-  el("detailTitle").textContent = str(b.Title) || "Untitled Book";
-
-  const body = el("detailBody");
-  body.replaceChildren();
-
-  const details = [
-    ["Author", "Author"],
-    ["Genre", "Genre"],
-    ["Shelf", "Shelf"],
-    ["Reading Status", "Reading Status"],
-    ["Loan Status", "Loan Status"],
-    ["ISBN", "ISBN"],
-    ["Pages", "Page Count"],
-    ["Publisher", "Publisher"],
-    ["Edition", "Edition"],
-    ["Rating", "rating"],
-    ["Description", "Description"]
-  ];
-
-  for (const [label, key] of details) {
-    if (!b[key]) continue;
-
-    const p = node("p");
-    const strong = node("strong", "", label + ": ");
-    p.append(strong, document.createTextNode(str(b[key])));
-    body.append(p);
-  }
-
-  el("details").showModal();
-}
-
 function makeCard(b) {
-  const card = node("article", "book");
-  const cover = node("div", "cover");
+  const card = node("article","book");
+  const cover = node("div","cover");
   const url = str(b["Cover URL"]).trim();
 
-  if (/^https:\/\//i.test(url)) {
+  if(/^https:\/\//i.test(url)) {
     const img = node("img");
     img.src = url;
     img.alt = "Cover of " + str(b.Title);
     img.loading = "lazy";
-    img.referrerPolicy = "no-referrer";
-    img.onerror = () => {
-      cover.replaceChildren(
-        node("span", "placeholder", "📖")
-      );
-    };
+    img.onerror = () => cover.replaceChildren(
+      node("span","placeholder","📖")
+    );
     cover.append(img);
   } else {
-    cover.append(node("span", "placeholder", "📖"));
+    cover.append(node("span","placeholder","📖"));
   }
 
-  const info = node("div", "info");
+  const info = node("div","info");
 
   info.append(
-    node("h3", "", b.Title || "Untitled Book"),
-    node("p", "", b.Author || "Unknown author"),
-    node("span", "tag", b.Genre || "Uncategorized"),
-    node("span", "tag", b["Reading Status"] || "Unread"),
-    node("p", "", "📍 " + (b.Shelf || "Unassigned"))
+    node("h3","",b.Title || "Untitled Book"),
+    node("p","",b.Author || "Unknown author"),
+    node("span","tag",b.Genre || "Uncategorized"),
+    node("span","tag",b["Reading Status"] || "Unread"),
+    node("p","","Shelf: " + (b.Shelf || "Unassigned"))
   );
 
-  const btn = node("button", "gold", "View Book ✦");
-  btn.addEventListener("click", () => showBook(b));
-
-  info.append(btn);
-  card.append(cover, info);
+  const button = node("button","gold card-button","View / Edit");
+  button.addEventListener("click",() => openEditor(b));
+  info.append(button);
+  card.append(cover,info);
 
   return card;
 }
 
 function render() {
-  const found = filtered();
+  const result = filteredBooks();
+  $("grid").replaceChildren();
 
-  el("grid").replaceChildren();
-
-  el("status").textContent =
-    found.length + " " +
-    (found.length === 1 ? "book" : "books") +
+  $("status").textContent =
+    result.length +
+    (result.length === 1 ? " book" : " books") +
     " in this view";
 
-  if (!found.length) {
-    el("grid").append(
-      node("div", "empty", "No books match these filters.")
+  if(!result.length) {
+    $("grid").append(
+      node("p","","No books match this view.")
     );
   } else {
-    found.forEach(b => el("grid").append(makeCard(b)));
+    result.forEach(b => $("grid").append(makeCard(b)));
+  }
+}
+
+async function loadBooks() {
+  try {
+    const response = await fetch(API_URL,{
+      credentials:"omit",
+      cache:"no-store"
+    });
+
+    if(!response.ok) {
+      throw Error("HTTP " + response.status);
+    }
+
+    const data = await response.json();
+
+    if(!data.success || !Array.isArray(data.books)) {
+      throw Error("Invalid catalog response");
+    }
+
+    books = data.books;
+    refreshFilters();
+    render();
+    return true;
+
+  } catch(e) {
+    console.error(e);
+    $("status").textContent =
+      "Unable to load books from Google Sheets.";
+    return false;
   }
 }
 
 function setView(next) {
   view = next;
 
-  document.querySelectorAll("nav button").forEach(b => {
-    b.classList.toggle("active", b.dataset.view === view);
-  });
+  document.querySelectorAll("nav button").forEach(b =>
+    b.classList.toggle(
+      "active",b.dataset.view === view
+    )
+  );
 
-  const titles = {
-    all: "✦ The Grand Library",
-    shelves: "📚 Browse the Shelves",
-    read: "❧ Reading Journal",
-    loans: "🔑 Books on Loan"
-  };
-
-  el("section").textContent = titles[view];
-
-  if (view === "shelves") el("shelf").focus();
+  $("section").textContent = ({
+    all:"✦ The Grand Library",
+    shelves:"Browse the Shelves",
+    read:"Reading Journal",
+    loans:"Books on Loan"
+  })[view];
 
   render();
 }
 
-// Load actual book data from Google Sheets.
-// This requires an anonymously readable web app endpoint
-// and browser-compatible cross-origin access.
-async function loadBooks() {
-  el("retry").hidden = true;
-  el("status").textContent = "Loading your library...";
-  el("grid").replaceChildren();
+function stopCamera() {
+  scanning = false;
+
+  if(cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+
+  $("scanner").srcObject = null;
+  $("scanner").hidden = true;
+}
+
+function openEditor(book=null) {
+  stopCamera();
+
+  editingId = book ? book["Book ID"] : null;
+  originalBook = book ? {...book} : {};
+  $("bookForm").reset();
+
+  const fields = {
+    isbn:"ISBN",
+    title:"Title",
+    authorInput:"Author",
+    genreInput:"Genre",
+    publisher:"Publisher",
+    pages:"Page Count",
+    coverUrl:"Cover URL",
+    shelfInput:"Shelf",
+    readingInput:"Reading Status",
+    loanInput:"Loan Status",
+    description:"Description"
+  };
+
+  for(const [id,key] of Object.entries(fields)) {
+    $(id).value = book
+      ? str(book[key])
+      : ({
+          readingInput:"Unread",
+          loanInput:"Available"
+        }[id] || "");
+  }
+
+  $("editorTitle").textContent =
+    book ? "Edit Book" : "Add New Book";
+
+  $("deleteButton").hidden = !book;
+  $("saveMessage").textContent = "";
+  $("scanMessage").textContent = "";
+  $("editor").showModal();
+}
+
+function formBook() {
+  return {
+    ...originalBook,
+    "Book ID":editingId || "",
+    Title:$("title").value.trim(),
+    Author:$("authorInput").value.trim(),
+    ISBN:$("isbn").value.trim(),
+    Genre:$("genreInput").value.trim(),
+    Publisher:$("publisher").value.trim(),
+    "Page Count":$("pages").value,
+    "Cover URL":$("coverUrl").value.trim(),
+    Shelf:$("shelfInput").value.trim(),
+    "Reading Status":$("readingInput").value,
+    "Loan Status":$("loanInput").value,
+    Description:$("description").value.trim()
+  };
+}
+
+async function lookupISBN() {
+  const isbn = $("isbn").value.replace(/[^0-9X]/gi,"");
+
+  if(!isbn) {
+    $("scanMessage").textContent = "Enter an ISBN first.";
+    return;
+  }
+
+  $("scanMessage").textContent = "Looking up book details...";
 
   try {
-    const response = await fetch(API_URL, {
-      method: "GET",
-      redirect: "follow",
-      credentials: "omit"
-    });
+    const response = await fetch(
+      "https://www.googleapis.com/books/v1/volumes?q=isbn:" +
+      encodeURIComponent(isbn)
+    );
 
-    if (!response.ok) {
-      throw new Error("HTTP " + response.status);
+    if(!response.ok) throw Error("Lookup unavailable");
+
+    const data = await response.json();
+    const info = data.items?.[0]?.volumeInfo;
+
+    if(!info) {
+      $("scanMessage").textContent =
+        "Book not found. Enter details manually.";
+      return;
     }
 
-    const payload = await response.json();
+    $("title").value = info.title || "";
+    $("authorInput").value = (info.authors || []).join(", ");
+    $("publisher").value = info.publisher || "";
+    $("pages").value = info.pageCount || "";
+    $("genreInput").value = (info.categories || []).join(", ");
+    $("description").value = info.description || "";
+    $("coverUrl").value = (
+      info.imageLinks?.thumbnail ||
+      info.imageLinks?.smallThumbnail ||
+      ""
+    ).replace(/^http:/,"https:");
 
-    if (!payload ||
-        payload.success !== true ||
-        !Array.isArray(payload.books)) {
-      throw new Error("Invalid catalog response");
-    }
+    $("scanMessage").textContent =
+      "Book found. Review the details and save.";
 
-    books = payload.books;
-    refreshFilters();
-    render();
-
-  } catch (err) {
-    console.error("Catalog loading failed:", err);
-
-    el("status").textContent =
-      "Unable to load books from Google Sheets. " +
-      "The catalog connection still needs configuration.";
-
-    el("retry").hidden = false;
-    el("grid").replaceChildren();
+  } catch(e) {
+    console.error(e);
+    $("scanMessage").textContent =
+      "Lookup unavailable. Enter details manually.";
   }
 }
 
-document.querySelectorAll("nav button").forEach(b => {
-  b.addEventListener("click", () => setView(b.dataset.view));
-});
+async function scanBarcode() {
+  if(scanning) {
+    stopCamera();
+    return;
+  }
 
-for (const id of [
-  "search", "shelf", "genre", "author", "reading"
-]) {
-  el(id).addEventListener(
-    id === "search" ? "input" : "change",
-    render
-  );
+  if(!("BarcodeDetector" in window)) {
+    $("scanMessage").textContent =
+      "This browser does not support barcode scanning. " +
+      "Enter the ISBN manually.";
+    return;
+  }
+
+  try {
+    const formats = (
+      await BarcodeDetector.getSupportedFormats()
+    ).filter(x => ["ean_13","ean_8"].includes(x));
+
+    if(!formats.length) {
+      throw Error("Unsupported barcode format");
+    }
+
+    const detector = new BarcodeDetector({formats});
+
+    cameraStream =
+      await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:"environment"}},
+        audio:false
+      });
+
+    $("scanner").srcObject = cameraStream;
+    $("scanner").hidden = false;
+    await $("scanner").play();
+
+    scanning = true;
+    $("scanMessage").textContent =
+      "Point your camera at the ISBN barcode.";
+
+    async function detect() {
+      if(!scanning) return;
+
+      try {
+        const codes = await detector.detect($("scanner"));
+        const match = codes.find(c =>
+          /^(978|979)\d{10}$/.test(c.rawValue)
+        );
+
+        if(match) {
+          $("isbn").value = match.rawValue;
+          stopCamera();
+          await lookupISBN();
+          return;
+        }
+      } catch(e) {
+        console.error(e);
+      }
+
+      if(scanning) setTimeout(detect,250);
+    }
+
+    detect();
+
+  } catch(e) {
+    stopCamera();
+    $("scanMessage").textContent =
+      "Camera unavailable. Enter the ISBN manually.";
+  }
 }
 
-el("close").addEventListener("click", () => {
-  el("details").close();
+async function sendChange(request) {
+  await fetch(API_URL,{
+    method:"POST",
+    mode:"no-cors",
+    body:new URLSearchParams({
+      payload:JSON.stringify(request)
+    })
+  });
+}
+
+async function verifyChange(action,book,id,priorIds) {
+  for(let i=0;i<6;i++) {
+    await new Promise(r => setTimeout(r,1200));
+
+    if(!await loadBooks()) continue;
+
+    if(action === "add") {
+      if(books.some(b =>
+        !priorIds.has(str(b["Book ID"])) &&
+        str(b.Title) === str(book.Title) &&
+        str(b.ISBN) === str(book.ISBN)
+      )) return true;
+
+    } else if(action === "delete") {
+      if(!books.some(b =>
+        str(b["Book ID"]) === str(id)
+      )) return true;
+
+    } else {
+      const b = books.find(b =>
+        str(b["Book ID"]) === str(id)
+      );
+
+      if(b && [
+        "Title","Author","ISBN","Genre",
+        "Publisher","Page Count","Cover URL",
+        "Shelf","Reading Status","Loan Status",
+        "Description"
+      ].every(k => str(b[k]) === str(book[k]))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+async function saveBook(e) {
+  e.preventDefault();
+
+  const book = formBook();
+  const action = editingId ? "update" : "add";
+  const id = editingId;
+  const priorIds = new Set(
+    books.map(b => str(b["Book ID"]))
+  );
+
+  if(!book.Title) return;
+
+  $("saveButton").disabled = true;
+  $("saveMessage").textContent = "Saving book...";
+
+  try {
+    await sendChange({action,book});
+
+    if(!await verifyChange(
+      action,book,id,priorIds
+    )) {
+      throw Error("Save not verified");
+    }
+
+    $("editor").close();
+    stopCamera();
+
+  } catch(e) {
+    console.error(e);
+    $("saveMessage").textContent =
+      "Save could not be verified. Check the catalog " +
+      "before trying again to avoid duplicates.";
+
+  } finally {
+    $("saveButton").disabled = false;
+  }
+}
+
+async function deleteBook() {
+  if(!editingId ||
+     !confirm("Permanently delete this book?")) return;
+
+  const id = editingId;
+  $("deleteButton").disabled = true;
+  $("saveMessage").textContent = "Deleting...";
+
+  try {
+    await sendChange({action:"delete",id});
+
+    if(!await verifyChange(
+      "delete",{},id,new Set()
+    )) {
+      throw Error("Delete not verified");
+    }
+
+    $("editor").close();
+    stopCamera();
+
+  } catch(e) {
+    console.error(e);
+    $("saveMessage").textContent =
+      "Deletion could not be verified. Check the catalog.";
+
+  } finally {
+    $("deleteButton").disabled = false;
+  }
+}
+
+document.querySelectorAll("nav button").forEach(b =>
+  b.addEventListener(
+    "click",() => setView(b.dataset.view)
+  )
+);
+
+["search","shelf","genre","author","reading"].forEach(id =>
+  $(id).addEventListener(
+    id === "search" ? "input" : "change",
+    render
+  )
+);
+
+$("addButton").addEventListener(
+  "click",() => openEditor()
+);
+
+$("closeEditor").addEventListener("click",() => {
+  $("editor").close();
+  stopCamera();
 });
 
-el("details").addEventListener("click", e => {
-  if (e.target === el("details")) el("details").close();
-});
-
-el("retry").addEventListener("click", loadBooks);
+$("editor").addEventListener("close",stopCamera);
+$("scanButton").addEventListener("click",scanBarcode);
+$("lookupButton").addEventListener("click",lookupISBN);
+$("bookForm").addEventListener("submit",saveBook);
+$("deleteButton").addEventListener("click",deleteBook);
 
 loadBooks();
 </script>
-
 </body>
 </html>
