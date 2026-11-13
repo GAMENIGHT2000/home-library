@@ -20,11 +20,15 @@ body {
   margin:0;
   color:var(--ink);
   font-family:Georgia,serif;
-  background-color:#a6b68b;
-  background-image:url("Sage%20Green%20Oak%20Leaf%20Shimmer.webp");
-  background-position:center top;
-  background-size:cover;
-  background-attachment:fixed;
+  background:
+    linear-gradient(#e8efe1a8,#e8efe1a8),
+    url("Sage%20Green%20Oak%20Leaf%20Shimmer.webp") center / cover fixed,
+    radial-gradient(ellipse at 15% 15%,#bed1b7 0,transparent 45%),
+    radial-gradient(ellipse at 85% 70%,#91aa91 0,transparent 50%),
+    repeating-linear-gradient(
+      120deg,transparent 0 35px,#284d3510 36px 37px
+    ),
+    #d9e4d3;
   min-height:100vh;
 }
 button,input,select,textarea { font:inherit; }
@@ -33,14 +37,11 @@ header {
   padding:42px 16px;
   text-align:center;
   color:#f9f2dc;
-  background-color:#17321b;
-  background-image:
-    linear-gradient(90deg,rgba(9,30,15,.28),rgba(9,30,15,.10),rgba(9,30,15,.28)),
-    url("Ornate%20Golden%20Vines%20on%20Forest%20Green.webp");
-  background-size:cover;
-  background-position:center;
+  background:
+    linear-gradient(120deg,#162a20a8,#385941b8),
+    url("Ornate%20Golden%20Vines%20on%20Forest%20Green.webp") center / cover,
+    radial-gradient(circle at 50% 0,#9fae8c,#20392c);
   border-bottom:5px double var(--gold);
-  text-shadow:0 2px 5px #091a0c,0 0 14px #091a0c;
 }
 h1 {
   font-weight:normal;
@@ -225,8 +226,6 @@ footer {
   border-top:3px double var(--gold);
 }
 @media(max-width:600px) {
-  body { background-attachment:scroll; }
-  header { background-position:center; padding:34px 12px; }
   .grid {
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
@@ -312,6 +311,12 @@ footer {
     </button>
   </div>
 
+  <div class="field">
+    <label for="titleLookup">Find a book by title (no barcode needed)</label>
+    <input id="titleLookup" placeholder="Enter book title" autocomplete="off">
+  </div>
+  <button type="button" class="gold" id="titleLookupButton">Search by Title</button>
+  <div id="titleResults" class="title-results" aria-live="polite"></div>
   <video id="scanner" playsinline muted hidden></video>
   <p id="scanMessage" class="message"></p>
 
@@ -581,15 +586,13 @@ function openEditor(book=null) {
         }[id] || "");
   }
 
-  if (!book && $("shelf").value) {
-    $("shelfInput").value = $("shelf").value;
-  }
-
   $("editorTitle").textContent =
     book ? "Edit Book" : "Add New Book";
   $("deleteButton").hidden = !book;
   $("saveMessage").textContent = "";
   $("scanMessage").textContent = "";
+  $("titleLookup").value = "";
+  $("titleResults").replaceChildren();
   $("editor").showModal();
 }
 
@@ -710,33 +713,22 @@ async function lookupISBN() {
         .join(", ");
     }
 
-    // Edition records often omit subjects. Check the related work
-    // record for additional subject classifications.
-    let subjects = Array.isArray(book.subjects) ? book.subjects : [];
-    if (!subjects.length && Array.isArray(book.works)) {
-      const workKey = book.works[0]?.key;
-      if (/^\/works\/[A-Za-z0-9]+$/.test(workKey || "")) {
-        try {
-          const workResponse = await fetch(
-            "https://openlibrary.org" + workKey + ".json"
-          );
-          if (workResponse.ok) {
-            const work = await workResponse.json();
-            subjects = Array.isArray(work.subjects) ? work.subjects : [];
-          }
-        } catch (workError) {
-          console.warn("Work subjects unavailable:", workError);
+    let subjects = book.subjects || [];
+    if(!subjects.length && Array.isArray(book.works) && book.works[0]?.key) {
+      try {
+        const workResponse = await fetch("https://openlibrary.org" + book.works[0].key + ".json");
+        if(workResponse.ok) {
+          const work = await workResponse.json();
+          subjects = work.subjects || [];
+          if(!$("description").value) $("description").value = readableDescription(work.description);
         }
-      }
+      } catch(error) { console.warn("Work metadata unavailable",error); }
     }
-    $("genreInput").value = subjects
-      .filter(subject => typeof subject === "string")
-      .slice(0, 3)
-      .join(", ");
+    $("genreInput").value = subjects.slice(0,3).join(", ");
 
     $("scanMessage").textContent =
       "Book found! Review the details, " +
-      "then save the book.";
+      "then save when saving is enabled.";
 
   } catch(e) {
     console.error("Open Library lookup error:",e);
@@ -745,6 +737,75 @@ async function lookupISBN() {
       "Check your connection or enter details manually.";
   } finally {
     $("lookupButton").disabled = false;
+  }
+}
+
+
+// Title lookup is independent of the catalog search and does not require an ISBN.
+async function lookupTitle() {
+  const query = $("titleLookup").value.trim();
+  const results = $("titleResults");
+  results.replaceChildren();
+  if(query.length < 2) {
+    results.append(node("p", "", "Enter at least two characters of a title."));
+    return;
+  }
+  $("titleLookupButton").disabled = true;
+  results.append(node("p", "", "Searching Open Library..."));
+  try {
+    const response = await fetch("https://openlibrary.org/search.json?title=" + encodeURIComponent(query) + "&limit=12&fields=key,title,author_name,first_publish_year,cover_i,isbn,edition_key,publisher,number_of_pages_median,subject");
+    if(!response.ok) throw Error("Open Library search failed");
+    const data = await response.json();
+    results.replaceChildren();
+    if(!data.docs || !data.docs.length) {
+      results.append(node("p", "", "No matching books found. You can enter the details manually below."));
+      return;
+    }
+    for(const b of data.docs) {
+      const btn = node("button", "title-result");
+      btn.type = "button";
+      if(b.cover_i) {
+        const img = node("img");
+        img.src = "https://covers.openlibrary.org/b/id/" + b.cover_i + "-S.jpg";
+        img.alt = "";
+        btn.append(img);
+      }
+      const summary = node("span");
+      summary.append(node("strong", "", b.title || "Untitled"));
+      summary.append(node("small", "", (b.author_name || []).slice(0,2).join(", ") + (b.first_publish_year ? " · " + b.first_publish_year : "")));
+      btn.append(summary);
+      btn.addEventListener("click", () => selectTitleResult(b));
+      results.append(btn);
+    }
+  } catch(error) {
+    console.error(error);
+    results.replaceChildren(node("p", "", "Title search is unavailable right now. You can still enter the book manually."));
+  } finally {
+    $("titleLookupButton").disabled = false;
+  }
+}
+
+async function selectTitleResult(b) {
+  $("title").value = b.title || "";
+  $("authorInput").value = (b.author_name || []).join(", ");
+  $("publisher").value = (b.publisher || []).slice(0,2).join(", ");
+  $("pages").value = b.number_of_pages_median || "";
+  $("genreInput").value = (b.subject || []).slice(0,3).join(", ");
+  $("isbn").value = ""; // Do not assume an ISBN identifies this particular edition.
+  $("coverUrl").value = b.cover_i ? "https://covers.openlibrary.org/b/id/" + b.cover_i + "-L.jpg" : "";
+  $("description").value = "";
+  $("titleResults").replaceChildren();
+  $("scanMessage").textContent = "Book selected. Review the details, choose a shelf, and save.";
+  if(/^\/works\/OL[0-9]+W$/.test(b.key || "")) {
+    try {
+      const response = await fetch("https://openlibrary.org" + b.key + ".json");
+      if(response.ok) {
+        const work = await response.json();
+        $("description").value = readableDescription(work.description);
+        if(!$("genreInput").value && Array.isArray(work.subjects))
+          $("genreInput").value = work.subjects.slice(0,3).join(", ");
+      }
+    } catch(error) { console.warn("Additional book details unavailable", error); }
   }
 }
 
@@ -964,40 +1025,23 @@ $("closeEditor").addEventListener("click",() => {
 $("editor").addEventListener("close",stopCamera);
 $("scanButton").addEventListener("click",scanBarcode);
 $("lookupButton").addEventListener("click",lookupISBN);
+$("titleLookupButton").addEventListener("click",lookupTitle);
+$("titleLookup").addEventListener("keydown",e => { if(e.key === "Enter") { e.preventDefault(); lookupTitle(); } });
 $("bookForm").addEventListener("submit",saveBook);
 $("deleteButton").addEventListener("click",deleteBook);
 
-// Open an NFC shelf link with the matching shelf selected.
 async function startLibrary() {
-  const loaded = await loadBooks();
-  if (!loaded) return;
-
-  const requestedShelf = new URLSearchParams(
-    window.location.search
-  ).get("shelf");
-
-  if (!requestedShelf) return;
-
-  const shelfSelector = $("shelf");
-  const match = Array.from(shelfSelector.options).find(
-    option => option.value.toLowerCase() ===
-      requestedShelf.trim().toLowerCase()
-  );
-
-  // Preserve the shelf filter even if that shelf is still empty.
-  if (match) {
-    shelfSelector.value = match.value;
-  } else if (/^Shelf [1-7]$/i.test(requestedShelf.trim())) {
-    const shelfName = "Shelf " + requestedShelf.trim().match(/[1-7]$/)[0];
-    shelfSelector.add(new Option(shelfName, shelfName));
-    shelfSelector.value = shelfName;
-  } else {
-    return;
+  await loadBooks();
+  const requestedShelf = new URLSearchParams(location.search).get("shelf");
+  if(requestedShelf) {
+    const selector = $("shelf");
+    if(!Array.from(selector.options).some(o => o.value.toLowerCase() === requestedShelf.toLowerCase()))
+      selector.add(new Option(requestedShelf,requestedShelf));
+    const option = Array.from(selector.options).find(o => o.value.toLowerCase() === requestedShelf.toLowerCase());
+    selector.value = option.value;
+    setView("shelves");
   }
-
-  setView("shelves");
 }
-
 startLibrary();
 </script>
 </body>
