@@ -702,12 +702,33 @@ async function lookupISBN() {
         .join(", ");
     }
 
-    $("genreInput").value =
-      (book.subjects || []).slice(0,3).join(", ");
+    // Edition records often omit subjects. Check the related work
+    // record for additional subject classifications.
+    let subjects = Array.isArray(book.subjects) ? book.subjects : [];
+    if (!subjects.length && Array.isArray(book.works)) {
+      const workKey = book.works[0]?.key;
+      if (/^\/works\/[A-Za-z0-9]+$/.test(workKey || "")) {
+        try {
+          const workResponse = await fetch(
+            "https://openlibrary.org" + workKey + ".json"
+          );
+          if (workResponse.ok) {
+            const work = await workResponse.json();
+            subjects = Array.isArray(work.subjects) ? work.subjects : [];
+          }
+        } catch (workError) {
+          console.warn("Work subjects unavailable:", workError);
+        }
+      }
+    }
+    $("genreInput").value = subjects
+      .filter(subject => typeof subject === "string")
+      .slice(0, 3)
+      .join(", ");
 
     $("scanMessage").textContent =
       "Book found! Review the details, " +
-      "then save when saving is enabled.";
+      "then save the book.";
 
   } catch(e) {
     console.error("Open Library lookup error:",e);
