@@ -688,30 +688,52 @@ async function lookupISBN() {
         encodeURIComponent(isbn) + "-L.jpg?default=false";
     }
 
-    const authorKeys = (book.authors || [])
-      .map(a => a.key)
-      .filter(Boolean);
-
-    if(authorKeys.length) {
-      const authorResults = await Promise.allSettled(
-        authorKeys.map(async key => {
-          if(!/^\/authors\/[A-Za-z0-9]+$/.test(key)) {
-            return "";
-          }
-          const r = await fetch(
-            "https://openlibrary.org" + key + ".json"
-          );
-          if(!r.ok) return "";
-          const a = await r.json();
-          return a.name || "";
-        })
-      );
-
-      $("authorInput").value = authorResults
-        .filter(r => r.status === "fulfilled" && r.value)
-        .map(r => r.value)
-        .join(", ");
+    // Open Library edition records frequently omit author names or keys.
+    // Try edition authors, then the linked work, then an ISBN search fallback.
+    async function resolveAuthors(records) {
+      if (!Array.isArray(records)) return [];
+      const names = await Promise.all(records.map(async item => {
+        if (typeof item?.name === "string") return item.name;
+        const key = item?.author?.key || item?.key;
+        if (typeof key !== "string" ||
+            !/^\/authors\/[A-Za-z0-9]+$/.test(key)) return "";
+        try {
+          const response = await fetch("https://openlibrary.org" + key + ".json");
+          if (!response.ok) return "";
+          const author = await response.json();
+          return author.name || "";
+        } catch (error) { return ""; }
+      }));
+      return [...new Set(names.filter(Boolean))];
     }
+
+    let authorNames = await resolveAuthors(book.authors);
+    if (!authorNames.length && Array.isArray(book.works)) {
+      const workKey = book.works[0]?.key;
+      if (/^\/works\/[A-Za-z0-9]+$/.test(workKey || "")) {
+        try {
+          const response = await fetch("https://openlibrary.org" + workKey + ".json");
+          if (response.ok) {
+            const work = await response.json();
+            authorNames = await resolveAuthors(work.authors);
+          }
+        } catch (error) { console.warn("Work authors unavailable", error); }
+      }
+    }
+    if (!authorNames.length) {
+      try {
+        const response = await fetch(
+          "https://openlibrary.org/search.json?isbn=" +
+          encodeURIComponent(isbn) + "&limit=1&fields=author_name,title,isbn"
+        );
+        if (response.ok) {
+          const data = await response.json();
+          authorNames = (data.docs?.[0]?.author_name || [])
+            .filter(name => typeof name === "string");
+        }
+      } catch (error) { console.warn("ISBN author fallback unavailable", error); }
+    }
+    $("authorInput").value = authorNames.join(", ");
 
     let subjects = book.subjects || [];
     if(!subjects.length && Array.isArray(book.works) && book.works[0]?.key) {
@@ -727,8 +749,7 @@ async function lookupISBN() {
     $("genreInput").value = subjects.slice(0,3).join(", ");
 
     $("scanMessage").textContent =
-      "Book found! Review the details, " +
-      "then save when saving is enabled.";
+      "Book found! Review the details, then save.";
 
   } catch(e) {
     console.error("Open Library lookup error:",e);
