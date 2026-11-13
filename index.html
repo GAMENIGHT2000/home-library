@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#294534">
 <title>The Enchanted Library</title>
 <style>
@@ -235,7 +235,6 @@ footer {
 </style>
 </head>
 <body>
-
 <header>
   <div class="ornament">❧ ✦ ❧</div>
   <h1>The Enchanted Library</h1>
@@ -368,8 +367,7 @@ footer {
       class="gold" hidden>
       Delete Book
     </button>
-    <p id="saveMessage" class="message"
-      role="status"></p>
+    <p id="saveMessage" class="message" role="status"></p>
   </form>
 </dialog>
 
@@ -411,14 +409,12 @@ function refreshFilters() {
     const previous = select.value;
     const first = select.options[0].cloneNode(true);
     select.replaceChildren(first);
-
     const values = [...new Set(
       books.flatMap(b =>
         str(b[field]).split(",")
           .map(s => s.trim()).filter(Boolean)
       )
     )].sort();
-
     values.forEach(v => select.add(new Option(v,v)));
     if(values.includes(previous)) select.value = previous;
   }
@@ -432,25 +428,20 @@ function matches(b,id,field) {
 
 function filteredBooks() {
   const q = $("search").value.toLowerCase().trim();
-
   return books.filter(b => {
     const searchable = [
       b.Title,b.Author,b.Genre,b.Description,b.ISBN
     ].map(str).join(" ").toLowerCase();
-
     if(q && !searchable.includes(q)) return false;
     if(!matches(b,"shelf","Shelf")) return false;
     if(!matches(b,"genre","Genre")) return false;
     if(!matches(b,"author","Author")) return false;
     if(!matches(b,"reading","Reading Status")) return false;
-
     if(view === "read" &&
       !["Read","Currently Reading"].includes(
         str(b["Reading Status"]))) return false;
-
     if(view === "loans" &&
       str(b["Loan Status"]) !== "Borrowed") return false;
-
     return true;
   });
 }
@@ -474,7 +465,6 @@ function makeCard(b) {
   }
 
   const info = node("div","info");
-
   info.append(
     node("h3","",b.Title || "Untitled Book"),
     node("p","",b.Author || "Unknown author"),
@@ -487,14 +477,12 @@ function makeCard(b) {
   button.addEventListener("click",() => openEditor(b));
   info.append(button);
   card.append(cover,info);
-
   return card;
 }
 
 function render() {
   const result = filteredBooks();
   $("grid").replaceChildren();
-
   $("status").textContent =
     result.length +
     (result.length === 1 ? " book" : " books") +
@@ -515,22 +503,17 @@ async function loadBooks() {
       credentials:"omit",
       cache:"no-store"
     });
-
     if(!response.ok) {
       throw Error("HTTP " + response.status);
     }
-
     const data = await response.json();
-
     if(!data.success || !Array.isArray(data.books)) {
       throw Error("Invalid catalog response");
     }
-
     books = data.books;
     refreshFilters();
     render();
     return true;
-
   } catch(e) {
     console.error(e);
     $("status").textContent =
@@ -541,38 +524,32 @@ async function loadBooks() {
 
 function setView(next) {
   view = next;
-
   document.querySelectorAll("nav button").forEach(b =>
     b.classList.toggle(
       "active",b.dataset.view === view
     )
   );
-
   $("section").textContent = ({
     all:"✦ The Grand Library",
     shelves:"Browse the Shelves",
     read:"Reading Journal",
     loans:"Books on Loan"
   })[view];
-
   render();
 }
 
 function stopCamera() {
   scanning = false;
-
   if(cameraStream) {
     cameraStream.getTracks().forEach(t => t.stop());
     cameraStream = null;
   }
-
   $("scanner").srcObject = null;
   $("scanner").hidden = true;
 }
 
 function openEditor(book=null) {
   stopCamera();
-
   editingId = book ? book["Book ID"] : null;
   originalBook = book ? {...book} : {};
   $("bookForm").reset();
@@ -602,7 +579,6 @@ function openEditor(book=null) {
 
   $("editorTitle").textContent =
     book ? "Edit Book" : "Add New Book";
-
   $("deleteButton").hidden = !book;
   $("saveMessage").textContent = "";
   $("scanMessage").textContent = "";
@@ -627,54 +603,125 @@ function formBook() {
   };
 }
 
-async function lookupISBN() {
-  const isbn = $("isbn").value.replace(/[^0-9X]/gi,"");
+/*
+  OPEN LIBRARY ISBN LOOKUP
 
-  if(!isbn) {
-    $("scanMessage").textContent = "Enter an ISBN first.";
+  Replaces Google Books with Open Library.
+  No Google Books API key or quota required.
+*/
+
+function readableDescription(value) {
+  if(typeof value === "string") return value;
+  if(value && typeof value.value === "string") {
+    return value.value;
+  }
+  return "";
+}
+
+async function lookupISBN() {
+  const isbn = $("isbn").value
+    .replace(/[^0-9X]/gi,"")
+    .toUpperCase();
+
+  if(!/^(?:\d{13}|\d{9}[\dX])$/.test(isbn)) {
+    $("scanMessage").textContent =
+      "Enter a valid 10- or 13-character ISBN.";
     return;
   }
 
-  $("scanMessage").textContent = "Looking up book details...";
+  $("lookupButton").disabled = true;
+  $("scanMessage").textContent =
+    "Searching Open Library for your book...";
 
   try {
-    const response = await fetch(
-      "https://www.googleapis.com/books/v1/volumes?q=isbn:" +
-      encodeURIComponent(isbn)
-    );
+    const url =
+      "https://openlibrary.org/isbn/" +
+      encodeURIComponent(isbn) + ".json";
 
-    if(!response.ok) throw Error("Lookup unavailable");
+    const response = await fetch(url);
 
-    const data = await response.json();
-    const info = data.items?.[0]?.volumeInfo;
-
-    if(!info) {
+    if(response.status === 404) {
       $("scanMessage").textContent =
-        "Book not found. Enter details manually.";
+        "Book not found in Open Library. " +
+        "You can enter its details manually.";
       return;
     }
 
-    $("title").value = info.title || "";
-    $("authorInput").value = (info.authors || []).join(", ");
-    $("publisher").value = info.publisher || "";
-    $("pages").value = info.pageCount || "";
-    $("genreInput").value = (info.categories || []).join(", ");
-    $("description").value = info.description || "";
-    $("coverUrl").value = (
-      info.imageLinks?.thumbnail ||
-      info.imageLinks?.smallThumbnail ||
-      ""
-    ).replace(/^http:/,"https:");
+    if(!response.ok) {
+      throw Error("Open Library HTTP " + response.status);
+    }
+
+    const book = await response.json();
+
+    if(!book || !book.title) {
+      $("scanMessage").textContent =
+        "No book details were returned. " +
+        "Enter them manually.";
+      return;
+    }
+
+    $("title").value = book.title || "";
+    $("publisher").value =
+      (book.publishers || []).join(", ");
+    $("pages").value = book.number_of_pages || "";
+    $("description").value =
+      readableDescription(book.description);
+
+    if(Array.isArray(book.covers) && book.covers.length) {
+      $("coverUrl").value =
+        "https://covers.openlibrary.org/b/id/" +
+        book.covers[0] + "-L.jpg";
+    } else {
+      $("coverUrl").value =
+        "https://covers.openlibrary.org/b/isbn/" +
+        encodeURIComponent(isbn) + "-L.jpg?default=false";
+    }
+
+    const authorKeys = (book.authors || [])
+      .map(a => a.key)
+      .filter(Boolean);
+
+    if(authorKeys.length) {
+      const authorResults = await Promise.allSettled(
+        authorKeys.map(async key => {
+          if(!/^\/authors\/[A-Za-z0-9]+$/.test(key)) {
+            return "";
+          }
+          const r = await fetch(
+            "https://openlibrary.org" + key + ".json"
+          );
+          if(!r.ok) return "";
+          const a = await r.json();
+          return a.name || "";
+        })
+      );
+
+      $("authorInput").value = authorResults
+        .filter(r => r.status === "fulfilled" && r.value)
+        .map(r => r.value)
+        .join(", ");
+    }
+
+    $("genreInput").value =
+      (book.subjects || []).slice(0,3).join(", ");
 
     $("scanMessage").textContent =
-      "Book found. Review the details and save.";
+      "Book found! Review the details, " +
+      "then save when saving is enabled.";
 
   } catch(e) {
-    console.error(e);
+    console.error("Open Library lookup error:",e);
     $("scanMessage").textContent =
-      "Lookup unavailable. Enter details manually.";
+      "Open Library is temporarily unavailable. " +
+      "Check your connection or enter details manually.";
+  } finally {
+    $("lookupButton").disabled = false;
   }
 }
+
+/*
+  BARCODE SCANNER
+*/
 
 async function scanBarcode() {
   if(scanning) {
@@ -709,8 +756,8 @@ async function scanBarcode() {
     $("scanner").srcObject = cameraStream;
     $("scanner").hidden = false;
     await $("scanner").play();
-
     scanning = true;
+
     $("scanMessage").textContent =
       "Point your camera at the ISBN barcode.";
 
@@ -744,6 +791,12 @@ async function scanBarcode() {
       "Camera unavailable. Enter the ISBN manually.";
   }
 }
+
+/*
+  GOOGLE SHEETS WRITE CONNECTION
+
+  Requires the future Apps Script backend update.
+*/
 
 async function sendChange(request) {
   await fetch(API_URL,{
@@ -788,7 +841,6 @@ async function verifyChange(action,book,id,priorIds) {
       }
     }
   }
-
   return false;
 }
 
@@ -824,7 +876,6 @@ async function saveBook(e) {
     $("saveMessage").textContent =
       "Save could not be verified. Check the catalog " +
       "before trying again to avoid duplicates.";
-
   } finally {
     $("saveButton").disabled = false;
   }
@@ -854,7 +905,6 @@ async function deleteBook() {
     console.error(e);
     $("saveMessage").textContent =
       "Deletion could not be verified. Check the catalog.";
-
   } finally {
     $("deleteButton").disabled = false;
   }
